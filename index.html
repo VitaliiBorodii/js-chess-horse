@@ -9,6 +9,7 @@
     }
 
     canvas {
+      cursor: pointer;
       margin: 10px 10px;
       border: solid 1px black;
     }
@@ -33,7 +34,21 @@
       </td>
       <td>
         <b>Within moves: </b>
-        <u><output id="way"></output></u></td>
+        <u><output id="way"></output></u>
+      </td>
+      <td>
+        <div>
+          <b>Start point: </b>
+          <u><output id="start"></output></u>
+        </div>
+        <div>
+          <b>End point: </b>
+          <u><output id="end"></output></u>
+        </div>
+      </td>
+      <td>
+        <button onclick="drawCanvas()">Clear the canvas</button>
+      </td>
     </tr>
   </table>
 

@@ -14,7 +14,6 @@ var countSteps = (start, finish, N, launchAsync) => {
     const t = Date.now();
     const twoMovesDist = 2 * Math.sqrt(5)// 2^2 + 1^2 - one horse move
 
-
     const [xf, yf] = finish;
 
     const createCoord = (x, y, prev) => ({
@@ -120,7 +119,7 @@ var countSteps = (start, finish, N, launchAsync) => {
         nextSteps.forEach(coords => drawVisited(coords.value));
         context.globalAlpha = 1;
 
-        setTimeout(asyncFn, 50);
+        setTimeout(asyncFn, 10);
       }
     };
     return launchAsync ? asyncFn() : syncFn();
@@ -139,7 +138,13 @@ horseImage.src = './horse.png';
 canvas.width = N;
 canvas.height = N;
 
+const m = new Map();
+
+
 const drawCanvas = () => {
+  m.clear();
+  document.getElementById('start').value = `[]`;
+  document.getElementById('end').value = `[]`;
   const context = canvas.getContext('2d');
   context.clearRect(0, 0, N * 10, N * 10);
   for (let i = 0; i < N; i += 10) {
@@ -182,8 +187,6 @@ const drawPath = (end, board, start) => {
   return ((xs === start[0]) && (ys === start[1])) ? null : drawPath(prev, board, start);
 };
 
-const m = new Map();
-
 const clickHandler = (e) => {
 
   const { offsetX, offsetY } = e;
@@ -193,42 +196,44 @@ const clickHandler = (e) => {
   const xf = Math.floor(offsetX / 10);
   const yf = Math.floor(offsetY / 10);
 
-  m.set(`${key}x`, xf);
-  m.set(`${key}y`, yf);
-
-  if (m.size === 2) {
+  if (!m.size) {
     drawCanvas();
     drawHorse([xf, yf]);
-  } else if (m.size === 4) {
-    drawHorse([xf, yf]);
-    const xs = m.get('1x');
-    const ys = m.get('1y');
-
-    canvas.removeEventListener('click', clickHandler);
-
-    const timer = Date.now();
-    countSteps([xs, ys], [xf, yf], n, true)
-      .then((result) => {
-        const { value } = result[xf][yf];
-
-        document.getElementById('result').value = `${((Date.now() - timer) / 1000).toFixed(3)} s`;
-        document.getElementById('way').value = (value);
-
-        context.strokeStyle = "#fff";
-        context.beginPath();
-        drawPath([xf, yf], result, [xs, ys]);
-        context.stroke();
-        context.closePath();
-
-        drawHorse([xs, ys]);
-        drawHorse([xf, yf]);
-
-
-        context.stroke();
-        m.clear();
-        canvas.addEventListener('click', clickHandler);
-      });
+    m.set(`${key}x`, xf);
+    m.set(`${key}y`, yf);
+    document.getElementById('start').value = `[${xf}, ${yf}]`;
+    return;
   }
+
+  drawHorse([xf, yf]);
+
+  const xs = m.get('1x');
+  const ys = m.get('1y');
+  document.getElementById('end').value = `[${xf}, ${yf}]`;
+
+  canvas.removeEventListener('click', clickHandler);
+
+  const timer = Date.now();
+  countSteps([xs, ys], [xf, yf], n, true)
+    .then((result) => {
+      const { value } = result[xf][yf];
+
+      document.getElementById('result').value = `${((Date.now() - timer) / 1000).toFixed(3)} s`;
+      document.getElementById('way').value = (value);
+
+      context.strokeStyle = "#fff";
+      context.beginPath();
+      drawPath([xf, yf], result, [xs, ys]);
+      context.stroke();
+      context.closePath();
+
+      drawHorse([xs, ys]);
+      drawHorse([xf, yf]);
+
+      context.stroke();
+      canvas.addEventListener('click', clickHandler);
+      m.clear();
+    });
 };
 
 
