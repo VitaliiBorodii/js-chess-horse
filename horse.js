@@ -193,9 +193,7 @@
     const dil = squareSize * 2;
     for (let i = 0; i < N; i += squareSize) {
       for (let j = 0; j < N; j += squareSize) {
-        (((i + j) % dil) === 0 ) ?
-          context.fillStyle = "#462506" :
-          context.fillStyle = "#F2C661";
+        context.fillStyle = (((i + j) % dil)) ? '#F2C661' : '#462506';
         context.fillRect(i, j, squareSize, squareSize);
       }
     }
@@ -215,6 +213,15 @@
     context.drawImage(horseImage, x, y, squareSize, squareSize);
   };
 
+  const eraseHorse = (point) => {
+    const [xs, ys] = point;
+    const dil = squareSize * 2;
+
+    context.fillStyle = (((xs + ys) % dil)) ? '#F2C661' : '#462506';
+    drawVisited(point);
+
+  };
+
   const drawPath = (end, board, start) => {
     const [xf, yf] = end;
     let { prev } = board[xf][yf];
@@ -232,6 +239,14 @@
 
   const clickHandler = (e) => {
 
+    if (m.size === 4) {
+
+      drawCanvas();
+
+      m.clear();
+
+    }
+
     const { offsetX, offsetY } = e;
 
     const key = m.size ? 2 : 1;
@@ -241,16 +256,14 @@
 
     if (xf < 0 || yf < 0 || xf >= n || yf >= n) return;
 
-    if (!m.size) {
-      drawCanvas();
-      drawHorse([xf, yf]);
-      m.set(`${key}x`, xf);
-      m.set(`${key}y`, yf);
+    m.set(`${key}x`, xf);
+    m.set(`${key}y`, yf);
+    drawHorse([xf, yf]);
+
+    if (m.size === 2) {
       document.getElementById('start').value = `[${xf}, ${yf}]`;
       return;
     }
-
-    drawHorse([xf, yf]);
 
     const xs = m.get('1x');
     const ys = m.get('1y');
@@ -283,7 +296,6 @@
 
         context.stroke();
         canvas.addEventListener('click', clickHandler);
-        m.clear();
       });
   };
 
