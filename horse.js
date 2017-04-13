@@ -3,6 +3,10 @@
   let n;
   let N;
 
+  const setIterations = (iterations) => {
+    document.getElementById('iterations').value = iterations;
+  };
+
   window.setCellSize = () => {
     const size = + document.getElementById('cell_size').value;
     squareSize = size;
@@ -25,6 +29,8 @@
     return new Promise((resolve, reject) => {
 
       const maze = new Array(N);
+
+      let iterations = 0;
 
       const optimize = document.getElementById('optimize').checked;
 
@@ -86,6 +92,7 @@
         };
 
         neighbours.forEach((coords) => {
+          iterations++;
           const [px, py] = coords.value;
           if (px < 0 || py < 0 || px >= N || py >= N) return false;
 
@@ -128,12 +135,14 @@
           fn()
         }
         resolve(maze);
+        setIterations(iterations);
       };
 
       const asyncFn = () => {
         if (found) {
-          console.log(`${((Date.now() - t) / 1000).toFixed(3)} s`);
           resolve(maze);
+          setIterations(iterations);
+
         } else {
           fn();
 
@@ -166,6 +175,7 @@
     document.getElementById('end').value = `[]`;
     document.getElementById('result').value = `-`;
     document.getElementById('way').value = '-';
+    setIterations('-');
     const context = canvas.getContext('2d');
 
     context.clearRect(0, 0, N * squareSize, N * squareSize);
