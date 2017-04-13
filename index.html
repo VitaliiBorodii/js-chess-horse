@@ -37,20 +37,7 @@
     </tr>
   </table>
 
-    <canvas width="10000" height='10000' id="canv"></canvas>
-
-    <script>
-      var a_canvas = document.getElementById("canv");
-      var context = a_canvas.getContext("2d");
-      for ( var i=0; i<10000; i+=10) {
-        for (var j=0; j<10000; j+=10) {
-          (((i+j)%20)==0) ? context.fillStyle = "#462506" : context.fillStyle = "#F2C661";
-          context.fillRect(i,j,10,10);
-        };
-      };
-
-      var m= [];
-    </script>
-    <script src="main.js"></script>
+    <canvas id="canv"></canvas>
+    <script src="horse.js"></script>
   </body>
 </html>
