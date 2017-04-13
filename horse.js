@@ -35,6 +35,7 @@
   var formKey = (x, y) => `${x}${y}`;
 
   var countSteps = (start, finish) => {
+    const t1 = Date.now();
 
     const launchAsync = !!document.getElementById('async').checked;
     const N = n;
@@ -44,6 +45,7 @@
       const maze = new Array(N);
 
       let iterations = 0;
+      let time = 0;
 
       const optimize = document.getElementById('optimize').checked;
 
@@ -96,8 +98,8 @@
           if (!optimize) {
             return result.push(coord);
           }
-          if (coord.dist >= twoMovesDist) {
-            result[0] = result[0] ? (result[0].dist > coord.dist ? coord : result[0]) : coord;
+          if (coord.dist > twoMovesDist) {
+            result[0] = result[0] ? (result[0].dist >= coord.dist ? coord : result[0]) : coord;
           } else {
             result.push(coord);
           }
@@ -135,8 +137,10 @@
 
 
       const fn = () => {
+        const t1 = Date.now();
         nextSteps = visitNeighbours(nextSteps, count);
         count++;
+        time += (Date.now() - t1);
       };
 
       const syncFn = () => {
@@ -144,14 +148,20 @@
         while (!found) {
           fn()
         }
-        resolve(maze);
-        setIterations(iterations);
+        resolve({
+          time,
+          maze,
+          iterations
+        });
       };
 
       const asyncFn = () => {
         if (found) {
-          resolve(maze);
-          setIterations(iterations);
+          resolve({
+            time,
+            maze,
+            iterations
+          });
 
         } else {
           fn();
@@ -164,6 +174,7 @@
           setTimeout(asyncFn, 10);
         }
       };
+      time += Date.now() - t1;
       return launchAsync ? asyncFn() : syncFn();
     })
 
@@ -261,20 +272,20 @@
   };
 
   const launch = (start, finish) => {
-    const timer = Date.now();
     const [xs, ys] = start;
     const [xf, yf] = finish;
     canvas.removeEventListener('click', clickHandler);
     countSteps([xs, ys], [xf, yf])
-      .then((result) => {
-        const { value } = result[xf][yf];
+      .then(({time , iterations, maze}) => {
+        const { value } = maze[xf][yf];
 
-        document.getElementById('result').value = `${((Date.now() - timer) / 1000).toFixed(3)} s`;
+        document.getElementById('result').value = `${(time/ 1000).toFixed(3)} s`;
         document.getElementById('way').value = (value);
+        setIterations(iterations);
 
         context.strokeStyle = "#fff";
         context.beginPath();
-        drawPath([xf, yf], result, [xs, ys]);
+        drawPath([xf, yf], maze, [xs, ys]);
         context.stroke();
         context.closePath();
 
