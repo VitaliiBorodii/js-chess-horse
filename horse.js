@@ -1,4 +1,5 @@
-const n = 200;
+const n = 150;
+const squareSize = 10;
 
 var formKey = (x, y) => `${x}${y}`;
 
@@ -55,6 +56,7 @@ var countSteps = (start, finish, N, launchAsync) => {
       const result = [];
 
       const sortedInsert = (coord) => {
+        //return result.push(coord);
         if (coord.dist >= twoMovesDist) {
           result[0] = result[0] ? (result[0].dist > coord.dist ? coord : result[0]) : coord;
         } else {
@@ -128,7 +130,7 @@ var countSteps = (start, finish, N, launchAsync) => {
 };
 
 
-const N = (n || 10) * 10;
+const N = (n || 10) * squareSize;
 const canvas = document.getElementById("canv");
 const context = canvas.getContext("2d");
 
@@ -146,13 +148,13 @@ const drawCanvas = () => {
   document.getElementById('start').value = `[]`;
   document.getElementById('end').value = `[]`;
   const context = canvas.getContext('2d');
-  context.clearRect(0, 0, N * 10, N * 10);
-  for (let i = 0; i < N; i += 10) {
-    for (let j = 0; j < N; j += 10) {
+  context.clearRect(0, 0, N * squareSize, N * squareSize);
+  for (let i = 0; i < N; i += squareSize) {
+    for (let j = 0; j < N; j += squareSize) {
       (((i + j) % 20) === 0 ) ?
         context.fillStyle = "#462506" :
         context.fillStyle = "#F2C661";
-      context.fillRect(i, j, 10, 10);
+      context.fillRect(i, j, squareSize, squareSize);
     }
   }
 };
@@ -160,17 +162,17 @@ const drawCanvas = () => {
 drawCanvas();
 
 const drawVisited = (point) => {
-  const x = point[0] * 10;
-  const y = point[1] * 10;
-  context.fillRect(x, y, 10, 10);
+  const x = point[0] * squareSize;
+  const y = point[1] * squareSize;
+  context.fillRect(x, y, squareSize, squareSize);
 };
 
 const drawHorse = (point) => {
-  const x = point[0] * 10;
-  const y = point[1] * 10;
+  const x = point[0] * squareSize;
+  const y = point[1] * squareSize;
   context.fillStyle = "#ffffff";
   context.globalAlpha = 1;
-  context.drawImage(horseImage, x, y, 10, 10);
+  context.drawImage(horseImage, x, y, squareSize, squareSize);
 };
 
 const drawPath = (end, board, start) => {
@@ -178,11 +180,12 @@ const drawPath = (end, board, start) => {
   let { prev } = board[xf][yf];
   prev = prev || start;
   const [xs, ys] = prev;
+  const half = Math.round(squareSize / 2);
 
-  context.moveTo(10 * xs + 5, 10 * ys + 5);
-  context.lineTo(10 * xf + 5, 10 * ys + 5);
-  context.moveTo(10 * xf + 5, 10 * ys + 5);
-  context.lineTo(10 * xf + 5, 10 * yf + 5);
+  context.moveTo(squareSize * xs + half, squareSize * ys + half);
+  context.lineTo(squareSize * xf + half, squareSize * ys + half);
+  context.moveTo(squareSize * xf + half, squareSize * ys + half);
+  context.lineTo(squareSize * xf + half, squareSize * yf + half);
 
   return ((xs === start[0]) && (ys === start[1])) ? null : drawPath(prev, board, start);
 };
@@ -193,8 +196,10 @@ const clickHandler = (e) => {
 
   const key = m.size ? 2 : 1;
 
-  const xf = Math.floor(offsetX / 10);
-  const yf = Math.floor(offsetY / 10);
+  const xf = Math.floor(offsetX / squareSize);
+  const yf = Math.floor(offsetY / squareSize);
+
+  if (xf < 0 || yf < 0 || xf >= n || yf >= n) return;
 
   if (!m.size) {
     drawCanvas();
@@ -209,10 +214,11 @@ const clickHandler = (e) => {
 
   const xs = m.get('1x');
   const ys = m.get('1y');
+
   document.getElementById('end').value = `[${xf}, ${yf}]`;
 
   canvas.removeEventListener('click', clickHandler);
-
+  console.log([xs, ys], [xf, yf])
   const timer = Date.now();
   countSteps([xs, ys], [xf, yf], n, true)
     .then((result) => {
