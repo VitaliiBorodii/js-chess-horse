@@ -9,6 +9,8 @@ var countSteps = (start, finish, N, launchAsync) => {
 
     const maze = new Array(N);
 
+    const optimize = document.getElementById('optimize').checked;
+
     for (let i = N; i--;) {
       maze[i] = new Array(N);
     }
@@ -56,7 +58,9 @@ var countSteps = (start, finish, N, launchAsync) => {
       const result = [];
 
       const sortedInsert = (coord) => {
-        //return result.push(coord);
+        if (!optimize) {
+          return result.push(coord);
+        }
         if (coord.dist >= twoMovesDist) {
           result[0] = result[0] ? (result[0].dist > coord.dist ? coord : result[0]) : coord;
         } else {
