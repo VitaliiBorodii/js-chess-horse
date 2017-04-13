@@ -50,7 +50,6 @@
       for (let i = N; i--;) {
         maze[i] = new Array(N);
       }
-      const t = Date.now();
       const twoMovesDist = 2 * Math.sqrt(5)// 2^2 + 1^2 - one horse move
 
       const [xf, yf] = finish;
@@ -105,7 +104,6 @@
         };
 
         neighbours.forEach((coords) => {
-          iterations++;
           const [px, py] = coords.value;
           if (px < 0 || py < 0 || px >= N || py >= N) return false;
 
@@ -114,20 +112,19 @@
           const value = cell && cell.value;
 
           if (!value || ((step + 1) < value)) {
+            iterations++;
+
             maze[px][py] = {
               prev: coords.prev,
               value: step + 1
             };
 
             if (px === xf && py === yf) {
-              found = true;
+              return found = true;
             }
 
             sortedInsert(coords);
 
-            return true;
-          } else {
-            return false
           }
         });
         return result;
