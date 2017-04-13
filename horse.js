@@ -8,13 +8,13 @@
   };
 
   window.setCellSize = () => {
-    const size = + document.getElementById('cell_size').value;
+    const size = +document.getElementById('cell_size').value;
     squareSize = size;
     setCanvasSize();
   };
 
   window.setCanvasSize = () => {
-    const size = + document.getElementById('canvas_size').value;
+    const size = +document.getElementById('canvas_size').value;
     n = size;
     N = n * squareSize;
     canvas.width = N;
@@ -22,19 +22,9 @@
     drawCanvas();
   };
 
-  const searchAgain = () => {
-    if (m.size === 4) {
-      const xs = m.get('1x');
-      const ys = m.get('1y');
-      const xf = m.get('2x');
-      const yf = m.get('2y');
-      launch([xs, ys], [xf, yf]);
-    }
-  };
+  const formKey = (x, y) => `${x}${y}`;
 
-  var formKey = (x, y) => `${x}${y}`;
-
-  var countSteps = (start, finish) => {
+  const countSteps = (start, finish) => {
     const t1 = Date.now();
 
     const launchAsync = !!document.getElementById('async').checked;
@@ -267,7 +257,6 @@
 
     document.getElementById('end').value = `[${xf}, ${yf}]`;
 
-
     launch([xs, ys], [xf, yf]);
   };
 
@@ -279,7 +268,7 @@
       .then(({time , iterations, maze}) => {
         const { value } = maze[xf][yf];
 
-        document.getElementById('result').value = `${(time/ 1000).toFixed(3)} s`;
+        document.getElementById('result').value = `${(time / 1000).toFixed(3)} s`;
         document.getElementById('way').value = (value);
         setIterations(iterations);
 
