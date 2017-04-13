@@ -1,63 +1,93 @@
 <!DOCTYPE html>
 <head>
-  <meta charset="utf-8">
-  <title>Chess</title>
-  <style>
+    <meta charset="utf-8">
+    <title>Chess</title>
+    <style>
 
-    body {
-      background: white;
-    }
+        body, html {
+            width: 100%;
+            max-width: 100%;
+            background: white;
+        }
 
-    canvas {
-      cursor: pointer;
-      margin: 10px 10px;
-      border: solid 1px black;
-    }
+        canvas {
+            cursor: pointer;
+            margin: 10px 10px;
+            border: solid 1px black;
+        }
 
-	   table {
-	      margin-left: 10px;
-	     }
+        table {
+            width: 100%;
+            margin-left: 10px;
+        }
 
-    td {
-	      min-width: 250px;
-	      max-width: 400px;
-      }
-  </style>
+        td {
+        }
+
+        td div {
+            padding: 5px;
+        }
+    </style>
 </head>
 
 <body>
-  <table>
+<table>
     <tr>
-      <td>
-        <b>Program has been ran: </b>
-        <u><output id="result"></output></u>
-      </td>
-      <td>
-        <b>Within moves: </b>
-        <u><output id="way"></output></u>
-      </td>
-      <td>
-        <div>
-          <b>Start point: </b>
-          <u><output id="start"></output></u>
-        </div>
-        <div>
-          <b>End point: </b>
-          <u><output id="end"></output></u>
-        </div>
-      </td>
-      <td>
-        <label>Optimize search
-          <input checked type="checkbox" id="optimize">
-        </label>
-      </td>
-      <td>
-        <button onclick="drawCanvas()">Clear the canvas</button>
-      </td>
-    </tr>
-  </table>
+        <td>
+            <div>
+                <label>Set canvas size:
+                    <input checked type="number" value="100" onchange="setCanvasSize()" id="canvas_size">
+                </label>
+            </div>
+            <div>
+                <label>Set cell size:
+                    <input checked type="number" value="10" onchange="setCellSize()" id="cell_size">
+                </label>
+            </div>
+        </td>
+        <td>
+            <div>
+                <b>Program has been ran: </b>
+                <u>
+                    <output id="result"></output>
+                </u>
+            </div>
+            <div>
+                <b>Within moves: </b>
+                <u>
+                    <output id="way"></output>
+                </u>
+            </div>
+        </td>
+        <td>
+            <div>
+                <b>Start point: </b>
+                <u>
+                    <output id="start"></output>
+                </u>
+            </div>
+            <div>
+                <b>End point: </b>
+                <u>
+                    <output id="end"></output>
+                </u>
+            </div>
+        </td>
+        <td>
+            <div>
+                <label>Optimize search
+                    <input checked type="checkbox" id="optimize">
+                </label>
+            </div>
+            <div>
+                <button onclick="drawCanvas()">Clear the canvas</button>
 
-    <canvas id="canv"></canvas>
-    <script src="horse.js"></script>
-  </body>
+            </div>
+        </td>
+    </tr>
+</table>
+
+<canvas id="canv"></canvas>
+<script src="horse.js"></script>
+</body>
 </html>
