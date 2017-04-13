@@ -151,6 +151,8 @@ const drawCanvas = () => {
   m.clear();
   document.getElementById('start').value = `[]`;
   document.getElementById('end').value = `[]`;
+  document.getElementById('result').value = `-`;
+  document.getElementById('way').value = '-';
   const context = canvas.getContext('2d');
   context.clearRect(0, 0, N * squareSize, N * squareSize);
   for (let i = 0; i < N; i += squareSize) {
