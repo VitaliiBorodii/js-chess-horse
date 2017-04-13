@@ -22,9 +22,22 @@
     drawCanvas();
   };
 
+  const searchAgain = () => {
+    if (m.size === 4) {
+      const xs = m.get('1x');
+      const ys = m.get('1y');
+      const xf = m.get('2x');
+      const yf = m.get('2y');
+      launch([xs, ys], [xf, yf]);
+    }
+  };
+
   var formKey = (x, y) => `${x}${y}`;
 
-  var countSteps = (start, finish, N, launchAsync) => {
+  var countSteps = (start, finish) => {
+
+    const launchAsync = !!document.getElementById('async').checked;
+    const N = n;
 
     return new Promise((resolve, reject) => {
 
@@ -246,10 +259,16 @@
 
     document.getElementById('end').value = `[${xf}, ${yf}]`;
 
-    canvas.removeEventListener('click', clickHandler);
-    console.log([xs, ys], [xf, yf])
+
+    launch([xs, ys], [xf, yf]);
+  };
+
+  const launch = (start, finish) => {
     const timer = Date.now();
-    countSteps([xs, ys], [xf, yf], n, true)
+    const [xs, ys] = start;
+    const [xf, yf] = finish;
+    canvas.removeEventListener('click', clickHandler);
+    countSteps([xs, ys], [xf, yf])
       .then((result) => {
         const { value } = result[xf][yf];
 
@@ -270,7 +289,6 @@
         m.clear();
       });
   };
-
 
   canvas.addEventListener('click', clickHandler);
   window.setCellSize();
