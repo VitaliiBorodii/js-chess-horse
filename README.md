@@ -1,2 +1,2 @@
 # js-chess-horse
-Chess Horse
+Demo: https://vitaliiborodii.github.io/js-chess-horse/
