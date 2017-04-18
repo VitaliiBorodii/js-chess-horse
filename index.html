@@ -28,6 +28,10 @@
         td div {
             padding: 5px;
         }
+
+        #start-x, #start-y, #end-x, #end-y {
+            width: 30px;
+        }
     </style>
 </head>
 
@@ -37,12 +41,12 @@
         <td>
             <div>
                 <label>Set canvas size:
-                    <input checked type="number" value="100" onchange="setCanvasSize()" id="canvas_size">
+                    <input checked type="number" value="100" id="canvas_size">
                 </label>
             </div>
             <div>
                 <label>Set cell size:
-                    <input checked type="number" value="10" onchange="setCellSize()" id="cell_size">
+                    <input checked type="number" value="10" id="cell_size">
                 </label>
             </div>
         </td>
@@ -67,18 +71,21 @@
             </div>
         </td>
         <td>
-            <div>
-                <b>Start point: </b>
-                <u>
-                    <output id="start"></output>
-                </u>
-            </div>
-            <div>
-                <b>End point: </b>
-                <u>
-                    <output id="end"></output>
-                </u>
-            </div>
+            <form id="manual-search">
+                <div>
+                    <b>Start point: </b>
+                    [<input min="0" id="start-x" type="number">,
+                    <input min="0" id="start-y" type="number">]
+                </div>
+                <div>
+                    <b>End point: </b>
+                    [<input min="0" id="end-x" type="number">,
+                    <input min="0" id="end-y" type="number">]
+                </div>
+                <div>
+                    <button type="submit" >Search!</button>
+                </div>
+            </form>
         </td>
         <td>
             <div>
@@ -92,7 +99,7 @@
                 </label>
             </div>
             <div>
-                <button onclick="drawCanvas()">Clear the canvas</button>
+                <button id="clear-button" >Clear the canvas</button>
             </div>
         </td>
     </tr>

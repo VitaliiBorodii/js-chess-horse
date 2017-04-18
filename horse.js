@@ -3,22 +3,77 @@
   let n;
   let N;
 
+  let searching = false;
+
+  const setStart = (x, y) => {
+    document.getElementById('start-x').value = x;
+    document.getElementById('start-y').value = y;
+    (x !== undefined) && (y !== undefined) && drawHorse([x, y]);
+  };
+
+  const setEnd = (x, y) => {
+    document.getElementById('end-x').value = x;
+    document.getElementById('end-y').value = y;
+    (x !== undefined) && (y !== undefined) && drawHorse([x, y]);
+  };
+
   const setIterations = (iterations) => {
     document.getElementById('iterations').value = iterations;
   };
 
-  window.setCellSize = () => {
+  const manualSearch = (e) => {
+    e.preventDefault();
+    let xs = Number(document.getElementById('start-x').value);
+    let ys = Number(document.getElementById('start-y').value);
+
+    let xf = Number(document.getElementById('end-x').value);
+    let yf = Number(document.getElementById('end-y').value);
+
+    xs = xs < 0 ? 0 : xs;
+    ys = ys < 0 ? 0 : ys;
+    xf = xf < 0 ? 0 : xf;
+    yf = yf < 0 ? 0 : yf;
+
+    xs = xs >= n ? n-1 : xs;
+    ys = ys >= n ? n-1 : ys;
+    xf = xf >= n ? n-1 : xf;
+    yf = yf >= n ? n-1 : yf;
+
+
+    if ((xs !== undefined) && (ys !== undefined) && (xf !== undefined) && (yf !== undefined)) {
+      drawCanvas();
+      setStart(xs, ys);
+      setEnd(xf, yf);
+
+      m.set('1x', xs);
+      m.set('1y', ys);
+      m.set('2x', xf);
+      m.set('2y', yf);
+
+
+      launch([xs, ys], [xf, yf]);
+
+    }
+  };
+
+  const setCellSize = () => {
     const size = +document.getElementById('cell_size').value;
     squareSize = size;
     setCanvasSize();
   };
 
-  window.setCanvasSize = () => {
+  const setCanvasSize = () => {
     const size = +document.getElementById('canvas_size').value;
     n = size;
     N = n * squareSize;
     canvas.width = N;
     canvas.height = N;
+
+    document.getElementById('start-x').setAttribute('max', n - 1);
+    document.getElementById('start-y').setAttribute('max', n - 1);
+    document.getElementById('end-x').setAttribute('max', n - 1);
+    document.getElementById('end-y').setAttribute('max', n - 1);
+
     drawCanvas();
   };
 
@@ -180,10 +235,10 @@
   const m = new Map();
 
 
-  window.drawCanvas = () => {
+  const drawCanvas = () => {
     m.clear();
-    document.getElementById('start').value = `[]`;
-    document.getElementById('end').value = `[]`;
+    setStart();
+    setEnd();
     document.getElementById('result').value = `-`;
     document.getElementById('way').value = '-';
     setIterations('-');
@@ -258,17 +313,17 @@
 
     m.set(`${key}x`, xf);
     m.set(`${key}y`, yf);
-    drawHorse([xf, yf]);
 
     if (m.size === 2) {
-      document.getElementById('start').value = `[${xf}, ${yf}]`;
+      setStart(xf, yf);
       return;
     }
 
     const xs = m.get('1x');
     const ys = m.get('1y');
 
-    document.getElementById('end').value = `[${xf}, ${yf}]`;
+    setEnd(xf, yf);
+
 
     launch([xs, ys], [xf, yf]);
   };
@@ -276,7 +331,8 @@
   const launch = (start, finish) => {
     const [xs, ys] = start;
     const [xf, yf] = finish;
-    canvas.removeEventListener('click', clickHandler);
+    if (searching) return;
+    searching = true;
     countSteps([xs, ys], [xf, yf])
       .then(({time , iterations, maze}) => {
         const { value } = maze[xf][yf];
@@ -295,11 +351,15 @@
         drawHorse([xf, yf]);
 
         context.stroke();
-        canvas.addEventListener('click', clickHandler);
+        searching = false;
       });
   };
 
   canvas.addEventListener('click', clickHandler);
-  window.setCellSize();
+  document.getElementById('canvas_size').addEventListener('change', setCanvasSize);
+  document.getElementById('cell_size').addEventListener('change', setCellSize);
+  document.getElementById('manual-search').addEventListener('submit', manualSearch);
+  document.getElementById('clear-button').addEventListener('click', drawCanvas);
+  setCellSize();
 
 })();
