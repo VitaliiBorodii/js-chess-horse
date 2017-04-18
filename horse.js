@@ -343,6 +343,7 @@
 
         context.strokeStyle = "#fff";
         context.beginPath();
+        context.globalAlpha = 1;
         drawPath([xf, yf], maze, [xs, ys]);
         context.stroke();
         context.closePath();
