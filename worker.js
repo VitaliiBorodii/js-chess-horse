@@ -1,4 +1,5 @@
-const countSteps = (start, finish, N, optimize) => {
+onmessage = ({data : {start, finish, N, optimize}}) => {
+  console.info('Worker:', {start, finish, N, optimize})
   const time = Date.now();
   const maze = new Array(N);
   let iterations = 0;
@@ -65,13 +66,14 @@ const countSteps = (start, finish, N, optimize) => {
       const cell = maze[px][py];
 
       const value = cell && cell.value;
+      const nextStepValue = step + 1;
 
-      if (!value || ((step + 1) < value)) {
+      if (!value || (nextStepValue < value)) {
         iterations++;
 
         maze[px][py] = {
           prev: coords.prev,
-          value: step + 1
+          value: nextStepValue
         };
 
         if (px === xf && py === yf) {
@@ -92,9 +94,9 @@ const countSteps = (start, finish, N, optimize) => {
     count++;
   }
 
-  return {
-    time,
+  postMessage({
+    time: Date.now() - time,
     maze,
     iterations
-  };
+  });
 };
