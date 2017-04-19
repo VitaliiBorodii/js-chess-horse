@@ -1,3 +1,5 @@
+const formKey = (x, y) => `${x}${y}`;
+
 onmessage = ({data : {start, finish, N, optimize}}) => {
   console.info('Worker:', {start, finish, N, optimize})
   const time = Date.now();
