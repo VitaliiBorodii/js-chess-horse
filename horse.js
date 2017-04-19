@@ -34,10 +34,10 @@
     xf = xf < 0 ? 0 : xf;
     yf = yf < 0 ? 0 : yf;
 
-    xs = xs >= n ? n-1 : xs;
-    ys = ys >= n ? n-1 : ys;
-    xf = xf >= n ? n-1 : xf;
-    yf = yf >= n ? n-1 : yf;
+    xs = xs >= n ? n - 1 : xs;
+    ys = ys >= n ? n - 1 : ys;
+    xf = xf >= n ? n - 1 : xf;
+    yf = yf >= n ? n - 1 : yf;
 
 
     if ((xs !== undefined) && (ys !== undefined) && (xf !== undefined) && (yf !== undefined)) {
