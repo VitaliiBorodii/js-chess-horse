@@ -1,7 +1,6 @@
 const formKey = (x, y) => `${x}${y}`;
 
 onmessage = ({data : {start, finish, N, optimize}}) => {
-  console.info('Worker:', {start, finish, N, optimize})
   const time = Date.now();
   const maze = new Array(N);
   let iterations = 0;
@@ -99,6 +98,7 @@ onmessage = ({data : {start, finish, N, optimize}}) => {
   postMessage({
     time: Date.now() - time,
     maze,
-    iterations
+    iterations,
+    moves: count
   });
 };
