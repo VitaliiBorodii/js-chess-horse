@@ -348,7 +348,7 @@
         context.stroke();
         context.closePath();
 
-        drawHorse([xs, ys]);
+        drawHorse([xs, ys]);//dasdasd
         drawHorse([xf, yf]);
 
         context.stroke();
