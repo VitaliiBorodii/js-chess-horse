@@ -91,8 +91,8 @@ describe('canPass', () => {
 
     let str = '\n';
     const maze = Array.from(cell.maze);
-    maze[cell.start[1]][cell.start[0]] = '-';
-    maze[cell.finish[1]][cell.finish[0]] = '+';
+    maze[cell.start[1]][cell.start[0]] = 8;
+    maze[cell.finish[1]][cell.finish[0]] = 8;
     maze.forEach(row => {
       str += JSON.stringify(row);
       str += '\n';
