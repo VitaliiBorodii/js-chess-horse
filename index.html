@@ -1,10 +1,8 @@
 <!DOCTYPE html>
 <head>
     <meta charset="utf-8">
-    <title>Maze</title>
-    <!--
-        <link rel="shortcut icon" type="image/png" href="horse.png"/>
-    -->
+    <title>Chess</title>
+    <link rel="shortcut icon" type="image/png" href="horse.png"/>
     <style>
 
         body, html {
@@ -18,31 +16,97 @@
             margin: 10px 10px;
             border: solid 1px black;
         }
-        #form, #stop, #resume, #frequency {
-            display: block;
-            float: left;
-            margin: 10px;
+
+        table {
+            width: 100%;
+            margin-left: 10px;
+        }
+
+        td {
+        }
+
+        td div {
+            padding: 5px;
+        }
+
+        #start-x, #start-y, #end-x, #end-y {
+            width: auto;
+            max-width: 100px;
         }
     </style>
 </head>
 
 <body>
-<canvas id="canvas"></canvas>
-<div class="controls">
-    <form id="form" action="">
-        <label for="">
-            <textarea name="pattern" id="" cols="20" rows="10"></textarea>
-            <button>Start!</button>
-        </label>
-    </form>
-    <button id="stop">Stop</button>
-    <button id="resume">Resume</button>
-    <label id="frequency" for="">
-        Frequency:
-        <output id="timeout-output"></output>
-        <input width="400" id="timeout" type="range" min="1" max="600">
-    </label>
-</div>
-<script src="maze.js"></script>
+<table>
+    <tr>
+        <td>
+            <div>
+                <label>Set canvas size:
+                    <input checked type="number" value="100" id="canvas_size">
+                </label>
+            </div>
+            <div>
+                <label>Set cell size:
+                    <input checked type="number" value="10" id="cell_size">
+                </label>
+            </div>
+        </td>
+        <td>
+            <div>
+                <b>Program has been ran: </b>
+                <u>
+                    <output id="result"></output>
+                </u>
+            </div>
+            <div>
+                <b>Within moves: </b>
+                <u>
+                    <output id="way"></output>
+                </u>
+            </div>
+            <div>
+                <b>Iterations: </b>
+                <u>
+                    <output id="iterations"></output>
+                </u>
+            </div>
+        </td>
+        <td>
+            <form id="manual-search">
+                <div>
+                    <b>Start point: </b>
+                    [<input min="0" id="start-x" type="number">,
+                    <input min="0" id="start-y" type="number">]
+                </div>
+                <div>
+                    <b>End point: </b>
+                    [<input min="0" id="end-x" type="number">,
+                    <input min="0" id="end-y" type="number">]
+                </div>
+                <div>
+                    <button type="submit">Search!</button>
+                </div>
+            </form>
+        </td>
+        <td>
+            <div>
+                <label>Optimize search
+                    <input checked type="checkbox" id="optimize">
+                </label>
+            </div>
+            <div>
+                <label>Slow version (with drawing)
+                    <input checked type="checkbox" id="async">
+                </label>
+            </div>
+            <div>
+                <button id="clear-button">Clear the canvas</button>
+            </div>
+        </td>
+    </tr>
+</table>
+
+<canvas id="canv"></canvas>
+<script src="horse.js"></script>
 </body>
 </html>
