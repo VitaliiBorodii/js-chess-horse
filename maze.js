@@ -1,138 +1,207 @@
-let getTrace;
-(() => {
+const rectSize = 6;
+const squareSize = rectSize;
 
-  const rectSize = 10;
+const formKey = (x, y) => `${x}-${y}`;
+const unformKey = (str) => str.split('-').map(Number);
 
-  const formKey = (x, y) => `${x}${y}`;
+const isEqual = (a, b) => {
+  let equal = true;
+  Object.keys(a).forEach(key => {
+    if (a[key] !== b[key]) {
+      equal = false
+    }
+  });
+  if (!equal) return equal;
+  Object.keys(b).forEach(key => {
+    if (a[key] !== b[key]) {
+      equal = false
+    }
+  });
+  return equal;
+};
+
+let universe = [];
+let size = 200;
+let interval;
+let timeout = 500;
+let cells = {};
+let counter = 0;
+
+const canvas = document.getElementById('canvas');
+const context = canvas.getContext('2d');
+
+canvas.width = size * rectSize;
+canvas.height = size * rectSize;
+
+const createNeighboursArray = (x, y) => [
+  [x - 1, y - 1],
+  [x, y - 1],
+  [x + 1, y - 1],
+  [x - 1, y],
+  [x + 1, y],
+  [x - 1, y + 1],
+  [x, y + 1],
+  [x + 1, y + 1]
+].filter(coord => {
+  const [x, y] = coord;
+  return !(x < 0 || y < 0 || x >= size || y >= size );
+});
 
 
-  const drawPath = (end, board, start) => {
-    const canvas = document.getElementById('canvas');
-    const context = canvas.getContext('2d');
+const draw = () => {
 
-    const [xf, yf] = end;
-    let { prev } = board[formKey(xf, yf)];
-    prev = prev || start;
-    const {x, y} = prev;
-    const half = Math.round(rectSize / 2);
+  universe = new Array(size);
 
-    context.moveTo(rectSize * x + half, rectSize * y + half);
-    context.lineTo(rectSize * xf + half, rectSize * y + half);
-    context.moveTo(rectSize * xf + half, rectSize * y + half);
-    context.lineTo(rectSize * xf + half, rectSize * yf + half);
+  context.strokeStyle = "#eee";
+  context.beginPath();
+  context.globalAlpha = 1;
 
-    return ((x === start[0]) && (y === start[1])) ? null : drawPath([prev.x, prev.y], board, start);
-  };
+  for (let i = size; i--;) {
+    universe[i] = new Array(size);
+
+    //horizontal lines
+    context.moveTo(0, squareSize * i);
+    context.lineTo(squareSize * size, squareSize * i);
+
+    //vertical lines
+    context.moveTo(squareSize * i, 0);
+    context.lineTo(squareSize * i, squareSize * size);
 
 
-  const drawWay = (finish, maze, start) => {
-    const canvas = document.getElementById('canvas');
-    const context = canvas.getContext('2d');
+  }
 
-    context.strokeStyle = "#00F";
-    context.beginPath();
-    context.globalAlpha = 1;
-    drawPath(finish, maze, start);
-    context.stroke();
-    context.closePath();
+  context.lineWidth = 1;
+  context.stroke();
+  context.closePath();
+};
 
-  };
+const addCells = (pattern) => {
+  stop();
 
-  const drawMaze = (start, finish, maze) => {
-    const [sx, sy] = start;
-    const [fx, fy] = finish;
-    const canvas = document.getElementById('canvas');
-    const context = canvas.getContext('2d');
-    const y = maze.length;
-    const x = maze[0].length;
-    canvas.height = y * rectSize;
-    canvas.width = x * rectSize;
+  pattern = pattern.split('\n');
 
-    maze.forEach((row, i) => {
-      row.forEach((cell, j) => {
-        context.fillStyle = cell ? '#000' : '#FFF';
-        if (i === sy && j === sx) {
-          context.fillStyle = '#F00';
-        } else if (i === fy && j === fx) {
-          context.fillStyle = '#0F0';
+  const height = pattern.length;
+  let width = 0;
+
+  pattern.forEach(row => {
+    if (row.length > width) {
+      width = row.length
+    }
+  });
+
+  const startY = Math.ceil((size - height) / 2);
+  const startX = Math.ceil((size - width) / 2);
+
+  pattern.forEach((row, j) => {
+    row
+      .split('')
+      .forEach((cell, i) => {
+        const x = startX + i;
+        const y = startY + j;
+        cells[formKey(x, y)] = cell === '*';
+      });
+  });
+  drawNewState();
+  interval = tick();
+};
+
+const drawNewState = () => {
+  Object.keys(cells).forEach((key) => {
+    const [x, y] = unformKey(key);
+    const cell = cells[key];
+    context.fillStyle = cell ? '#000' : '#FFF';
+    context.fillRect(x * rectSize + 1, y * rectSize + 1, squareSize - 1, squareSize - 1);
+  });
+};
+
+const tick = () => {
+
+  counter++;
+
+  const newGeneration = Object.assign({}, cells);
+
+  Object.keys(cells).forEach((key) => {
+    const [x, y] = unformKey(key);
+    const cell = cells[key];
+
+    let aliveNeighbours = 0;
+
+    createNeighboursArray(x, y)
+      .forEach(neighbour => {
+        const [x, y] = neighbour;
+
+        const cell = cells[formKey(x, y)];
+
+        if (cell) {
+          aliveNeighbours++
         }
-        context.fillRect(j * rectSize, i * rectSize, rectSize, rectSize);
-      })
-    })
-  };
-
-
-  const getOut = (start, finish, maze, trace) => {
-    trace && drawMaze(start, finish, maze);
-    const visited = {};
-    const y = maze.length;
-    const x = maze[0].length;
-
-    const visitNeighbours = (px, py, prev) => {
-
-      const neighbours = [
-        [px - 1, py],
-        [px + 1, py],
-        [px, py - 1],
-        [px, py + 1]
-      ];
-
-      const key = formKey(px, py);
-      visited[key] = {
-        prev,
-        reachable: true
-      };
-
-      const nextPrev = {x: px, y: py};
-
-      neighbours.forEach((coords) => {
-        const [px, py] = coords;
-        if (px < 0 || py < 0 || px >= x || py >= y) return;
-        const key = formKey(px, py);
-        if (visited.hasOwnProperty(key)) return;
-
-        (maze[py][px] === 0) ? visitNeighbours(px, py, nextPrev) : (visited[key] = {
-          prev,
-          reachable: false
-        });
-
       });
 
-    };
-
-    visitNeighbours(start[0], start[1], null);
-
-    const key = formKey(finish[0], finish[1]);
-
-    return trace ? visited : !!(visited[key] && visited[key].reachable);
-  };
-
-  const canPass = (start, finish, maze) => getOut(start, finish, maze, false);
-  getTrace = (start, finish, size) => {
-    const maze =  new Array(size);
-    for (let i = 0; i < size; i++) {
-      maze[i] = new Array(size);
-      for (let j = 0; j < size; j++) {
-        maze[i][j] = Math.round(Math.random());
+    if (cell) {
+      if (aliveNeighbours <= 1) {
+        //console.warn(`Cell ${key} dies from loneliness`);
+        newGeneration[key] = false;
+      } else if (aliveNeighbours > 1 && aliveNeighbours < 4) {
+        //console.log(`Cell ${key} continue to live`);
+      } else if (aliveNeighbours >= 4) {
+        //console.warn(`Cell ${key} dies from overpopulation`);
+        newGeneration[key] = false;
       }
-    }
-    maze[start[1]][start[0]] = 0;
-    maze[finish[1]][finish[0]] = 0;
-
-    const board = getOut(start, finish, maze, true);
-    const result = board[formKey(finish[0], finish[1])];
-
-    if (result) {
-      drawWay(finish, board, start);
+    } else if (aliveNeighbours === 3) {
+      //console.info(`Cell ${key} births`);
+      newGeneration[key] = true;
     }
 
-    return result;
+  });
 
-  };
-
-  try {
-    module.exports.canPass = canPass;
-  } catch (err) {
-    console.error(err);
+  if (isEqual(cells, newGeneration)) {
+    console.error(`Life is Stopped!! It has been existed for ${counter} moves!!`);
+    return stop();
   }
-})();
+  cells = newGeneration;
+
+  drawNewState();
+
+  interval = setTimeout(tick, timeout);
+
+};
+
+draw();
+
+const stop = () => clearInterval(interval);
+const resume = () => stop() || tick();
+
+const clickHandler = (e) => {
+  const x = Math.floor(e.offsetX / rectSize);
+  const y = Math.floor(e.offsetY / rectSize);
+  const key = formKey(x, y);
+  cells[key] = !cells[key];
+  drawNewState();
+};
+
+canvas.addEventListener('click', clickHandler);
+
+document.getElementById('stop').addEventListener('click', stop);
+document.getElementById('resume').addEventListener('click', resume);
+
+const displayTimeout = () => {
+  document.getElementById('timeout-output').value = `${Math.round(60000/timeout)} turns per minute`;
+};
+
+document.getElementById('timeout').value = timeout;
+displayTimeout();
+
+document.getElementById('timeout').addEventListener('change', (e) => {
+  timeout =  Number(e.target.value) || timeout;
+  displayTimeout();
+});
+
+const form = document.getElementById('form');
+form.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const pattern = form.pattern.value;
+  addCells(pattern);
+  form.pattern.value = '';
+});
+
+
